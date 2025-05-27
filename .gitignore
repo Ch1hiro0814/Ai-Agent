@@ -1,6 +1,6 @@
-application-local.yml
+**/application-local.yml
 tmp/
-test/
+/src/test/
 
 HELP.md
 target/
