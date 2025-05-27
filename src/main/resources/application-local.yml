@@ -7,3 +7,7 @@ spring:
       chat:
         options:
           model: qwen-plus
+  datasource:
+    url: jdbc:postgresql://rm-cn-fhh4a330g000112o.rwlb.rds.aliyuncs.com:5432/ai-agent?sslmode=disable
+    username: db_user
+    password: Wenzekai123

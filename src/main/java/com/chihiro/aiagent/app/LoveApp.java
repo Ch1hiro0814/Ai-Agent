@@ -83,6 +83,9 @@ public class LoveApp {
     @Resource
     private Advisor loveAppragCloudAdvisor;
 
+    @Resource
+    private VectorStore pgVectorVectorStore;
+
     public String doChatWithRAG(String message, String chatId){
         ChatResponse chatResponse = chatClient
                 .prompt()
@@ -90,8 +93,9 @@ public class LoveApp {
                 .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
                 .advisors(new MyLoggerAdvisor())
-//                .advisors(new QuestionAnswerAdvisor(loveAppVectorStore))
-                .advisors(loveAppragCloudAdvisor)
+                .advisors(new QuestionAnswerAdvisor(loveAppVectorStore))
+//                .advisors(loveAppragCloudAdvisor)
+//                .advisors(new QuestionAnswerAdvisor(pgVectorVectorStore))
                 .call()
                 .chatResponse();
         String text = chatResponse.getResult().getOutput().getText();

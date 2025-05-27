@@ -1,5 +1,6 @@
 application-local.yml
 tmp
+test
 
 HELP.md
 target/
