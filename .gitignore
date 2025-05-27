@@ -1,7 +1,6 @@
 application-local.yml
 tmp
-test
-
+test/
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
