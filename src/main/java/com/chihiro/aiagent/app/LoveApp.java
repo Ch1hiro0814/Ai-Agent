@@ -3,6 +3,8 @@ package com.chihiro.aiagent.app;
 import com.chihiro.aiagent.advisor.MyLoggerAdvisor;
 import com.chihiro.aiagent.advisor.ReReadingAdvisor;
 import com.chihiro.aiagent.chatmemory.FileBasedChatMemory;
+import com.chihiro.aiagent.rag.LoveAppRagCustomAdvisorFactory;
+import com.chihiro.aiagent.rag.QueryRewritter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -14,6 +16,7 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
 
@@ -86,20 +89,47 @@ public class LoveApp {
     @Resource
     private VectorStore pgVectorVectorStore;
 
+    @Resource
+    private QueryRewritter queryRewritter;
+
     public String doChatWithRAG(String message, String chatId){
+        String rewrittenMessage = queryRewritter.doQueryRewrite(message);
         ChatResponse chatResponse = chatClient
                 .prompt()
-                .user(message)
+                .user(rewrittenMessage)
                 .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
                 .advisors(new MyLoggerAdvisor())
-                .advisors(new QuestionAnswerAdvisor(loveAppVectorStore))
+//                .advisors(new QuestionAnswerAdvisor(loveAppVectorStore))
 //                .advisors(loveAppragCloudAdvisor)
 //                .advisors(new QuestionAnswerAdvisor(pgVectorVectorStore))
+                .advisors(LoveAppRagCustomAdvisorFactory.createLoveAppRagCustomAdvisor(
+                        loveAppVectorStore, "各国前十名校的详细介绍.md"
+                ))
                 .call()
                 .chatResponse();
         String text = chatResponse.getResult().getOutput().getText();
         log.info("content: {}", text);
         return text;
     }
+
+    @Resource
+    private ToolCallback[] allTools;
+
+    public String doChatWithTools(String message, String chatId) {
+        ChatResponse response = chatClient
+                .prompt()
+                .user(message)
+                .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
+                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
+                // 开启日志，便于观察效果
+                .advisors(new MyLoggerAdvisor())
+                .tools(allTools)
+                .call()
+                .chatResponse();
+        String content = response.getResult().getOutput().getText();
+        log.info("content: {}", content);
+        return content;
+    }
+
 }
