@@ -1,5 +1,6 @@
 **/application-local.yml
-**/mcp-servers.json
+**/application-prod.yml
+src/main/resources/mcp-servers.json
 tmp/
 /src/test/
 

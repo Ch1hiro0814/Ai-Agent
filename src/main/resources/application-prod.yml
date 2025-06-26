@@ -1,8 +1,6 @@
 spring:
   application:
     name: ai-agent
-#  profiles:
-#    active: local
   ai:
     vectorstore:
       pgvector:
@@ -10,12 +8,21 @@ spring:
         dimensions: 1536
         distance-type: COSINE_DISTANCE
         max-document-batch-size: 10000 # Optional: Maximum number of documents per batch
-#    mcp:
-#      client:
-#        sse:
-#          connections:
-#            server1:
-#              url: http://localhost:8127
+    #    mcp:
+    #      client:
+    #        sse:
+    #          connections:
+    #            server1:
+    #              url: http://localhost:8127
+    dashscope:
+      api-key: sk-b676274db03340a19ae435c694dca7e1
+      chat:
+        options:
+          model: qwen-plus
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
 #        stdio:
 #          servers-configuration: classpath:mcp-servers.json
 
@@ -43,4 +50,5 @@ knife4j:
   setting:
     language: zh_cn
 
-
+search-api:
+  api-key: 14yKEZ3EuoVjNvX3unXY5n2V
